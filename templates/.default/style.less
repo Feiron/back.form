@@ -1,0 +1,47 @@
+.form {
+  button[type='submit'],
+  input[type='submit'] {
+    position: relative;
+
+    &:before {
+      content: ' ';
+      position: absolute;
+      right: 50%;
+      top: 50%;
+      margin-top: -12px;
+      margin-right: -12px;
+      width: 24px;
+      height: 24px;
+      border: 2px solid;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.5s;
+      animation: 0.8s linear infinite rotate;
+    }
+
+    &.sending {
+      pointer-events: none;
+      cursor: not-allowed;
+      text-indent: 200%; /* We dont want to loose width*/
+      white-space: nowrap;
+      overflow: hidden;
+
+      &:before {
+        transition-delay: 0.5s;
+        transition-duration: 1s;
+        opacity: 1;
+      }
+    }
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}
