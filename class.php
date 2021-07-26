@@ -55,6 +55,8 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 		$arParams['CHECK_MSG']   = $arParams['CHECK_MSG'] == 'Y';
 		$arParams['AJAX']        = $arParams['AJAX'] == "Y";
 
+		$arParams['SUBMIT_EVENT'] = $arParams['SUBMIT_EVENT'] ?: 'FeiOnBackFormSubmit';
+
 		if ($arParams['AJAX']) {
 			\Bitrix\Main\Page\Asset::getInstance()->addJs($this->getPath() . "/js/formsubmitter.js");
 			$arParams['CAPTCHA'] = false;
@@ -193,6 +195,8 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 				$arIblockFields['NAME']['VALUE'] :
 				\GetMessage('ELEMENT_NAME');
 
+		$EVENT_FIELDS = [];
+
 		foreach ($arIblockFields as $code => $field) {
 			$PROPS[$code]['VALUE'] = $field['VALUE'];
 			if ($field['TYPE'] == "L") {
@@ -215,13 +219,12 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 
 		if ($NEW_ID = $el->Add($arIblockElement)) {
 
+			$EVENT_FIELDS['PAGE_URL'] = $GLOBALS['APPLICATION']->GetCurPage();
+			$arEventFields            = $EVENT_FIELDS;
+			$arEventFields['MSG']     = $arIblockElement['DETAIL_TEXT'];
+
 			if ($this->arParams['MSG_EVENT']) {
-
-				$EVENT_FIELDS['PAGE_URL'] = $GLOBALS['APPLICATION']->GetCurPage();
-				$arEventFields            = $EVENT_FIELDS;
-				$arEventFields['MSG']     = $arIblockElement['DETAIL_TEXT'];
 				\CEvent::SendImmediate($this->arParams['MSG_EVENT'], SITE_ID, $arEventFields);
-
 			}
 
 			if ($this->arParams['CRM']) {
@@ -244,6 +247,25 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 				}
 
 			}
+
+			/**
+			 * Checking events
+			 */
+			$event = new \Bitrix\Main\Event(
+				"main",
+				$this->arParams['SUBMIT_EVENT'],
+				$arEventFields
+			);
+			$event->send();
+			if ($event->getResults()) {
+				foreach ($event->getResults() as $evenResult) {
+
+					if ($evenResult->getType() != \Bitrix\Main\EventResult::SUCCESS) {
+						throw new \Exception('FORM_ERROR');
+					}
+				}
+			}
+
 		}
 	}
 
