@@ -10,7 +10,7 @@
 - Событие успешной отправки (`[main, FeiOnBackFormSubmit]` возможно повесить свой доп обработчик, например для Rest API метода)
 - Отправка базовым методом через почтовое событие писем (`CEvent::SendImmediate`) - регулируются через параметры компонента
 
-```` 
+```php
 use Bitrix\Main\EventManager;
 
 $handler = EventManager::getInstance()->addEventHandler(
