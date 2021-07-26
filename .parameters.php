@@ -64,6 +64,24 @@ $arComponentParameters = array(
 			"TYPE"          => "STRING",
 			"DEFAULT_VALUE" => "",
 		),
+		"CRM_LOGIN"       => array(
+			"PARENT"        => "BASE",
+			"NAME"          => "CRM_LOGIN",
+			"TYPE"          => "STRING",
+			"DEFAULT_VALUE" => "",
+		),
+		"CRM_PASSWORD"       => array(
+			"PARENT"        => "BASE",
+			"NAME"          => "CRM_PASSWORD",
+			"TYPE"          => "STRING",
+			"DEFAULT_VALUE" => "",
+		),
+		"SUBMIT_EVENT"       => array(
+			"PARENT"        => "BASE",
+			"NAME"          => "SUBMIT_EVENT",
+			"TYPE"          => "STRING",
+			"DEFAULT_VALUE" => "",
+		),
 		"CRM_SOURCE_ID" => array(
 			"PARENT"        => "BASE",
 			"NAME"          => "CRM_SOURCE_ID",
