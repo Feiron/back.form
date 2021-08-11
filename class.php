@@ -143,13 +143,13 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 			if (array_key_exists($key, $arIblockFields)) {
 
 				$FIELD          = &$arIblockFields[$key];
-				$FIELD['VALUE'] = htmlspecialchars(trim($value));
+				$FIELD['VALUE'] = $value;
 
 				$VAL = &$FIELD['VALUE'];
 
 				switch ($key) {
 					case 'EMAIL':
-						if (!\check_email($VAL)) {
+						if ($FIELD['IS_REQUIRED'] == "Y" && !\check_email($VAL)) {
 							$arFormErrors[] = \GetMessage("FIELD_EMAIL_NOTVALID");
 						}
 						break;
@@ -172,7 +172,7 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 
 					default:
 						if ($FIELD['IS_REQUIRED'] == "Y") {
-							if (strlen($VAL) <= 0) {
+							if (!$VAL) {
 								$arFormErrors[] = \GetMessage("FIELD_EMPTY", array("#FIELD#" => $FIELD['PROPS']['NAME']));
 							}
 						}
@@ -198,11 +198,29 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 		$EVENT_FIELDS = [];
 
 		foreach ($arIblockFields as $code => $field) {
-			$PROPS[$code]['VALUE'] = $field['VALUE'];
-			if ($field['TYPE'] == "L") {
-				$EVENT_FIELDS[$code] = $field['LIST_ENUM'][$field['VALUE']]['VALUE'];
-			} else {
-				$EVENT_FIELDS[$code] = $field['VALUE'];
+
+
+			switch ($field['TYPE']) {
+
+				case 'F':
+
+					if (is_array($field['VALUE'])) {
+						foreach ($field['VALUE'] as $iFileID) {
+							$PROPS[$code][] = \CFile::MakeFileArray($iFileID);
+						}
+					} else {
+						$PROPS[$code][] = \CFile::MakeFileArray($field['VALUE']);
+					}
+
+					break;
+				case 'L':
+					$EVENT_FIELDS[$code]   = $field['LIST_ENUM'][$field['VALUE']]['VALUE'];
+					$PROPS[$code]['VALUE'] = $field['VALUE'];
+
+					break;
+				default:
+					$PROPS[$code]['VALUE'] = $field['VALUE'];
+					$EVENT_FIELDS[$code]   = $field['VALUE'];
 			}
 		}
 

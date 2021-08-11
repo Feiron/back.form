@@ -27,10 +27,30 @@
 
 				?>
                 <div class="large-6 columns">
-					<? if ($arField['TYPE'] == 'L') {
+					<? if ($arField['TYPE'] == 'F') { ?>
+                        <label><?= GetMessage("FIELD_" . $code) ? GetMessage("FIELD_" . $code) : $arField['PROPS']['NAME'] ?><? if ($arField['IS_REQUIRED'] == 'Y'): ?>
+                                <span class="required" style="color: red;">*</span><? endif; ?>
+							<?
+							$GLOBALS['APPLICATION']->IncludeComponent(
+								"bitrix:main.file.input", "drag_n_drop",
+								array(
+									"INPUT_NAME"       => $code,
+									"INPUT_VALUE"      => '',
+									"INPUT_CAPTION"    => "25 мб",
+									"MULTIPLE"         => $arField['PROPS']['MULTIPLE'],
+									"MODULE_ID"        => "ok.main",
+									"MAX_FILE_SIZE"    => "25000000",
+									"ALLOW_UPLOAD"     => "F",
+									"ALLOW_UPLOAD_EXT" => $arField['PROPS']['FILE_TYPE'],
+									"CONTROL_ID"       => 'BackFormFile'
+								),
+								false
+							); ?>
+                        </label>
+					<? } else if ($arField['TYPE'] == 'L') {
 						?>
                         <label><?= GetMessage("FIELD_" . $code) ?><? if ($arField['IS_REQUIRED'] == 'Y'): ?>
-                            <span class="required" style="color: red;">*</span><? endif; ?>
+                                <span class="required" style="color: red;">*</span><? endif; ?>
                             <select<? if ($arField['IS_REQUIRED'] == 'Y'): ?> required=""<? endif; ?>
                                     type="<?= $strInputType ?>"
                                     id="i_<?= $code ?>"
@@ -40,16 +60,16 @@
                                     <option<?= $arOption['DEF'] == 'Y' ? ' checked=""' : '' ?> value="<?= $uID ?>"><?= $arOption['VALUE'] ?></option>
 								<? endforeach; ?>
                             </select>
-                            </label>
-							<?
-						} else { ?>
+                        </label>
+						<?
+					} else { ?>
                         <label><?= GetMessage("FIELD_" . $code) ?><? if ($arField['IS_REQUIRED'] == 'Y'): ?>
                                 <span class="required" style="color: red;">*</span><? endif; ?>
                             <input<? if ($arField['IS_REQUIRED'] == 'Y'): ?> required=""<? endif; ?>
                                     type="<?= $strInputType ?>"
                                     id="i_<?= $code ?>"
                                     name="<?= $code ?>"
-                                    value="<?=$arField['DEFAULT_VALUE']?>"
+                                    value="<?= $arField['DEFAULT_VALUE'] ?>"
                                     placeholder="<?= GetMessage("FIELD_" . $code) ?>"
                             />
                         </label>
