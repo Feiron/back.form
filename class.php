@@ -188,6 +188,12 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 		 * SEND and Write
 		 *******************************************************/
 
+		/**
+		 * @var $PROPS array Для инфоблока
+		 * @var $arIblockFields array поля + VALUE
+		 * @var $EVENT_FIELDS array для события code => value
+		 */
+
 		$PROPS = [];
 
 		$strElementName =
@@ -211,6 +217,11 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 					} else {
 						$PROPS[$code][] = \CFile::MakeFileArray($field['VALUE']);
 					}
+
+					/*
+					 * TODO: Непонятно что отправлять в массив события
+					 */
+					$EVENT_FIELDS[$code]   = $field['VALUE'];
 
 					break;
 				case 'L':
@@ -279,6 +290,7 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 				foreach ($event->getResults() as $evenResult) {
 
 					if ($evenResult->getType() != \Bitrix\Main\EventResult::SUCCESS) {
+						$arFormErrors[] = 'Ошибка обработчика';
 						throw new \Exception('FORM_ERROR');
 					}
 				}
