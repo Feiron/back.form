@@ -80,7 +80,7 @@
         <div class="row">
             <div class="large-12 columns">
                 <label><?= GetMessage("FIELD_MSG") ?>
-                    <textarea rows="5" name="MSG" id="comment" placeholder="Опишите обращение, что у вас за компания или любую другую информацию, которая может быть полезна"></textarea>
+                    <textarea rows="5" name="MSG" id="comment" placeholder=""></textarea>
                 </label>
                 <p class="AGREEMENT"><?= GetMessage("AGREEMENT") ?></a></p>
             </div>

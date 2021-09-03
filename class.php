@@ -34,6 +34,7 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 			'IBLOCK_TYPE',
 			'CAPTCHA',
 			'MSG_EVENT',
+			'SUBMIT_EVENT',
 			'CHECK_MSG',
 			'AJAX',
 			'CRM',
@@ -55,7 +56,7 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 		$arParams['CHECK_MSG']   = $arParams['CHECK_MSG'] == 'Y';
 		$arParams['AJAX']        = $arParams['AJAX'] == "Y";
 
-		$arParams['SUBMIT_EVENT'] = $arParams['SUBMIT_EVENT'] ?: 'FeiOnBackFormSubmit';
+		$arParams['SUBMIT_EVENT'] = $arParams['SUBMIT_EVENT'] ?: false;
 
 		if ($arParams['AJAX']) {
 			\Bitrix\Main\Page\Asset::getInstance()->addJs($this->getPath() . "/js/formsubmitter.js");
@@ -189,9 +190,9 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 		 *******************************************************/
 
 		/**
-		 * @var $PROPS array Для инфоблока
+		 * @var $PROPS          array Для инфоблока
 		 * @var $arIblockFields array поля + VALUE
-		 * @var $EVENT_FIELDS array для события code => value
+		 * @var $EVENT_FIELDS   array для события code => value
 		 */
 
 		$PROPS = [];
@@ -221,7 +222,7 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 					/*
 					 * TODO: Непонятно что отправлять в массив события
 					 */
-					$EVENT_FIELDS[$code]   = $field['VALUE'];
+					$EVENT_FIELDS[$code] = $field['VALUE'];
 
 					break;
 				case 'L':
@@ -280,22 +281,23 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 			/**
 			 * Checking events
 			 */
-			$event = new \Bitrix\Main\Event(
-				"main",
-				$this->arParams['SUBMIT_EVENT'],
-				$arEventFields
-			);
-			$event->send();
-			if ($event->getResults()) {
-				foreach ($event->getResults() as $evenResult) {
+			if ($this->arParams['SUBMIT_EVENT']) {
+				$event = new \Bitrix\Main\Event(
+					"main",
+					$this->arParams['SUBMIT_EVENT'],
+					$arEventFields
+				);
+				$event->send();
+				if ($event->getResults()) {
+					foreach ($event->getResults() as $evenResult) {
 
-					if ($evenResult->getType() != \Bitrix\Main\EventResult::SUCCESS) {
-						$arFormErrors[] = 'Ошибка обработчика';
-						throw new \Exception('FORM_ERROR');
+						if ($evenResult->getType() != \Bitrix\Main\EventResult::SUCCESS) {
+							$arFormErrors[] = 'Ошибка обработчика';
+							throw new \Exception('FORM_ERROR');
+						}
 					}
 				}
 			}
-
 		}
 	}
 
