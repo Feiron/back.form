@@ -29,7 +29,7 @@
                 <div class="large-6 columns">
 					<? if ($arField['TYPE'] == 'F') { ?>
                         <label><?= GetMessage("FIELD_" . $code) ? GetMessage("FIELD_" . $code) : $arField['PROPS']['NAME'] ?><? if ($arField['IS_REQUIRED'] == 'Y'): ?>
-                                <span class="required" style="color: red;">*</span><? endif; ?>
+                                <span class="required" style="color: red;">*</span><? endif; ?>:
 							<?
 							$GLOBALS['APPLICATION']->IncludeComponent(
 								"bitrix:main.file.input", "drag_n_drop",
@@ -50,7 +50,7 @@
 					<? } else if ($arField['TYPE'] == 'L') {
 						?>
                         <label><?= GetMessage("FIELD_" . $code) ?><? if ($arField['IS_REQUIRED'] == 'Y'): ?>
-                                <span class="required" style="color: red;">*</span><? endif; ?>
+                                <span class="required" style="color: red;">*</span><? endif; ?>:
                             <select<? if ($arField['IS_REQUIRED'] == 'Y'): ?> required=""<? endif; ?>
                                     type="<?= $strInputType ?>"
                                     id="i_<?= $code ?>"
@@ -64,7 +64,7 @@
 						<?
 					} else { ?>
                         <label><?= GetMessage("FIELD_" . $code) ?><? if ($arField['IS_REQUIRED'] == 'Y'): ?>
-                                <span class="required" style="color: red;">*</span><? endif; ?>
+                                <span class="required" style="color: red;">*</span><? endif; ?>:
                             <input<? if ($arField['IS_REQUIRED'] == 'Y'): ?> required=""<? endif; ?>
                                     type="<?= $strInputType ?>"
                                     id="i_<?= $code ?>"
@@ -79,7 +79,7 @@
         </div>
         <div class="row">
             <div class="large-12 columns">
-                <label><?= GetMessage("FIELD_MSG") ?>
+                <label><?= GetMessage("FIELD_MSG") ?>:
                     <textarea rows="5" name="MSG" id="comment" placeholder=""></textarea>
                 </label>
                 <p class="AGREEMENT"><?= GetMessage("AGREEMENT") ?></a></p>

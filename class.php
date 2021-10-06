@@ -52,7 +52,7 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 		$arParams['IBLOCK_ID']   = $arParams['IBLOCK_ID'] > 0 ? $arParams['IBLOCK_ID'] : 0;
 		$arParams['IBLOCK_TYPE'] = strlen($arParams['IBLOCK_TYPE']) > 0 ? $arParams['IBLOCK_TYPE'] : false;
 		$arParams['CAPTCHA']     = !($arParams['CAPTCHA'] == 'N');
-		$arParams['MSG_EVENT']   = strlen($arParams['MSG_EVENT']) > 0 ? $arParams['MSG_EVENT'] : 'iblock_backform_submit';
+		$arParams['MSG_EVENT']   = strlen($arParams['MSG_EVENT']) > 0 ? $arParams['MSG_EVENT'] : false;
 		$arParams['CHECK_MSG']   = $arParams['CHECK_MSG'] == 'Y';
 		$arParams['AJAX']        = $arParams['AJAX'] == "Y";
 
