@@ -63,7 +63,7 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 			$arParams['CAPTCHA'] = false;
 		}
 
-		$arParams['CACHE_TIME'] = $arParams['CACHE_TIME'] >= 0 ? $arParams['CACHE_TIME'] : 3600;
+		$arParams['CACHE_TIME'] = $arParams['CACHE_TIME'] >= 0 ? intval($arParams['CACHE_TIME']) : 3600;
 
 
 		$arParams['CRM']     = $arParams['CRM'] == "Y";
