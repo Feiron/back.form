@@ -27,3 +27,19 @@ $handler = EventManager::getInstance()->addEventHandler(
     }
 );
 ````
+```php
+$GLOBALS['APPLICATION']->IncludeComponent(
+			'fei:back.form',
+			'',
+			[
+				'IBLOCK_ID'    => 16,
+				"IBLOCK_TYPE"  => 'ORDERS',
+				"AJAX"         => 'Y',
+				"MSG_EVENT"    => "BACKFORM_RENTERS",
+				'SUBMIT_EVENT' => 'FeiOnBackFormSubmit'
+			],
+			[
+				'HIDE_ICONS' => 'Y'
+			]
+		);
+````
