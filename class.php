@@ -107,6 +107,7 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 	/**
 	 * @param $arFields
 	 *
+	 * @return null[]
 	 * @throws \Exception
 	 */
 	public function addResultAction($arFields)
@@ -114,7 +115,10 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 		$arFormErrors = [];
 
 		try {
-			$this->addFormResult($arFields, $arFormErrors);
+
+			$id = $this->addFormResult($arFields, $arFormErrors);
+
+			return ['ID' => $id, 'FIELDS' => $arFields];
 		} catch (\Exception $e) {
 			throw new \Exception(
 				\GetMessage('FORM_ERRORS') . implode('\n', $arFormErrors)
@@ -298,7 +302,11 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 					}
 				}
 			}
+
+			return $NEW_ID;
 		}
+
+		return null;
 	}
 
 	/**

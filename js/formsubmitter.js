@@ -29,7 +29,6 @@ class FormSubmitter {
                 }
             })
             .then(function (response) {
-
                 BX.onCustomEvent($this, $this.arEvents.sent, [response, $this]);
 
             })
