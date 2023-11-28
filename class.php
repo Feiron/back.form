@@ -13,11 +13,16 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
 
 use Bitrix\Main\Engine\Contract\Controllerable;
 use Bitrix\Main\Engine\Controller;
+use Bitrix\Main\Errorable;
 use Bitrix\Main\SystemException;
 use Bitrix\Main\Web;
+use Bitrix\Main\Error;
+use Bitrix\Main\ErrorCollection;
 
-class IblockFrom extends \CBitrixComponent implements Controllerable
+class IblockFrom extends \CBitrixComponent implements Controllerable, Errorable
 {
+	protected $errorCollection;
+
 	public function configureActions(): array
 	{
 		return [
@@ -87,6 +92,8 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 			$this->arResult["CAPTCHA_CODE"] = htmlspecialchars($GLOBALS["APPLICATION"]->CaptchaGetCode());
 		}
 
+		$this->errorCollection = new ErrorCollection();
+
 		return parent::onPrepareComponentParams($arParams);
 	}
 
@@ -116,13 +123,11 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 
 		try {
 
-			$id = $this->addFormResult($arFields, $arFormErrors);
-
+			$id = $this->addFormResult($arFields);
 			return ['ID' => $id, 'FIELDS' => $arFields];
+
 		} catch (\Exception $e) {
-			throw new \Exception(
-				\GetMessage('FORM_ERRORS') . implode('\n', $arFormErrors)
-			);
+			return \GetMessage('FORM_ERRORS');
 		}
 	}
 
@@ -144,48 +149,56 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 			"VALUE" => ''
 		];
 
-		foreach ($arFields as $key => $value) {
-			if (array_key_exists($key, $arIblockFields)) {
+		foreach ($arIblockFields as $key => $arIblockField) {
 
-				$FIELD          = &$arIblockFields[$key];
-				$FIELD['VALUE'] = $value;
+			$VAL = false;
 
-				$VAL = &$FIELD['VALUE'];
-
-				switch ($key) {
-					case 'EMAIL':
-						if ($FIELD['IS_REQUIRED'] == "Y" && !\check_email($VAL)) {
-							$arFormErrors[] = \GetMessage("FIELD_EMAIL_NOTVALID");
-						}
-						break;
-
-					case 'CAPTCHA':
-						$captcha_code = htmlspecialchars($_POST['captcha_code']);
-						$captcha_sid  = htmlspecialchars($_POST['captcha_sid']);
-						if (!$GLOBALS['APPLICATION']->CaptchaCheckCode($captcha_code, $captcha_sid)) {
-							$arFormErrors[] = \GetMessage('FIELD_CAPTCHA_WRONG');
-						}
-						break;
-
-					case 'MSG':
-						$VAL = htmlspecialchars(trim($VAL));
-						if (strlen($VAL) <= 0 && $this->arParams['CHECK_MSG']) {
-							$arFormErrors[]      = \GetMessage("FIELD_EMPTY", array("#FIELD#" => GetMessage('FIELD_MESSAGE')));
-							$arFormErrors['MSG'] = true;
-						}
-						break;
-
-					default:
-						if ($FIELD['IS_REQUIRED'] == "Y") {
-							if (!$VAL) {
-								$arFormErrors[] = \GetMessage("FIELD_EMPTY", array("#FIELD#" => $FIELD['PROPS']['NAME']));
-							}
-						}
-				}
+			if (array_key_exists($key, $arFields)) {
+				$VAL = htmlspecialchars(trim($arFields[$key]));
 			}
+
+			switch ($key) {
+				case 'EMAIL':
+					if ($arIblockField['IS_REQUIRED'] == "Y" && !\check_email($VAL)) {
+						$this->errorCollection->setError(
+							new Error(\GetMessage("FIELD_EMAIL_NOTVALID"))
+						);
+					}
+					break;
+
+				case 'CAPTCHA':
+					$captcha_code = htmlspecialchars($_POST['captcha_code']);
+					$captcha_sid  = htmlspecialchars($_POST['captcha_sid']);
+					if (!$GLOBALS['APPLICATION']->CaptchaCheckCode($captcha_code, $captcha_sid)) {
+						$this->errorCollection->setError(
+							new Error(\GetMessage("FIELD_CAPTCHA_WRONG"))
+						);
+					}
+					break;
+
+				case 'MSG':
+					$VAL = htmlspecialchars(trim($VAL));
+					if (strlen($VAL) <= 0 && $this->arParams['CHECK_MSG']) {
+						$this->errorCollection->setError(
+							new Error(\GetMessage("FIELD_EMPTY", array("#FIELD#" => GetMessage('FIELD_MESSAGE'))))
+						);
+					}
+					break;
+
+				default:
+
+					if ($arIblockField['IS_REQUIRED'] == "Y") {
+						if (!$VAL) {
+							$this->errorCollection->setError(
+								new Error(\GetMessage("FIELD_EMPTY", array("#FIELD#" => $arIblockField['PROPS']['NAME'])))
+							);
+						}
+					}
+			}
+
 		}
 
-		if (!empty($arFormErrors)) {
+		if (!$this->errorCollection->isEmpty()) {
 			throw new \Exception('FORM_FIELDS_ERROR');
 		}
 
@@ -255,6 +268,7 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 
 			$EVENT_FIELDS['PAGE_URL'] = $GLOBALS['APPLICATION']->GetCurPage();
 			$arEventFields            = $EVENT_FIELDS;
+			$arEventFields['ID']      = $NEW_ID;
 			$arEventFields['MSG']     = $arIblockElement['DETAIL_TEXT'];
 
 			if ($this->arParams['MSG_EVENT']) {
@@ -413,5 +427,15 @@ class IblockFrom extends \CBitrixComponent implements Controllerable
 		}
 
 		return $arFields;
+	}
+
+	public function getErrors()
+	{
+		return $this->errorCollection->toArray();
+	}
+
+	public function getErrorByCode($code)
+	{
+		return $this->errorCollection->getErrorByCode($code);
 	}
 }
